@@ -9,9 +9,18 @@ export const allCalendar = async (req: Request, res: Response) => {
 };
 
 export const createDate = async (req: Request, res: Response) => {
+  const { birth } = req.body;
+  const birthDate = new Date(birth);
+
+  // delete birth
+  delete req.body.birth;
   // TODO:: Create condition for date
+  const createdAt = new Date("2020-10-5");
+  const competitionDate = new Date("2022-11-1");
+  const data = { ...req.body, birthDate, createdAt, competitionDate };
+  console.log(data);
   // const data = req.body;
-  const newCalendar = await prisma.calendar.create({ data: req.body });
+  const newCalendar = await prisma.calendar.create({ data });
   console.log(newCalendar);
   res.status(201).json(newCalendar);
 };

@@ -18,6 +18,7 @@ model Calendar {
   phone Int
   career String
   poetry String
+  birthDate DateTime
   createdAt DateTime 
   competitionDate DateTime
 }
