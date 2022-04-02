@@ -21,3 +21,4 @@ modulos no terminados
 3. condicion para entregarle al usuario su fecha de evento
 
 ![image](https://res.cloudinary.com/dx9n8tsyu/image/upload/v1648942029/react-proyect/screenshot-localhost_3000-2022.04.02-17_26_39_slaqdk.png)
+![image2](https://res.cloudinary.com/dx9n8tsyu/image/upload/v1648943088/react-proyect/screenshot-localhost_3000-2022.04.02-17_43_48_fspgvj.png)
