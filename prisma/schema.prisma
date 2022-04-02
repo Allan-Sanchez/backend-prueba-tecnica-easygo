@@ -1,0 +1,24 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+model Calendar {
+  id Int @id @default(autoincrement())
+  uuid String   @default(uuid())
+  carnet String
+  name String
+  address String
+  gender String
+  phone Int
+  career String
+  poetry String
+  createdAt DateTime 
+  competitionDate DateTime
+}
+
