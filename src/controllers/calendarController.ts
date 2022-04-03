@@ -9,20 +9,81 @@ export const allCalendar = async (req: Request, res: Response) => {
 };
 
 export const createDate = async (req: Request, res: Response) => {
-  const { birth } = req.body;
+  const { birth, carnet, poetry } = req.body;
   const birthDate = new Date(birth);
-
+  let tempcompetitionDate = "";
   // delete birth
   delete req.body.birth;
-  // TODO:: Create condition for date
-  const createdAt = new Date("2020-10-5");
-  const competitionDate = new Date("2022-11-1");
-  const data = { ...req.body, birthDate, createdAt, competitionDate };
-  console.log(data);
+  // add date created
+  const registerDate = Date.now();
+  const createdAt = new Date(registerDate);
+  // const createdAt = new Date("2022-04-02");
+  // console.log(createdAt);
+
+  // condition date
+  const lastCharacter = carnet.split("").slice(-1);
+
+  if (lastCharacter == "1" && poetry === "dramatica") {
+    // concursara 5 dias despues sabado y domingo no cuenta
+    let day = createdAt.getDate();
+    let year = createdAt.getFullYear();
+    let month = createdAt.getMonth() + 1;
+    let dayValidate = createdAt.getDay();
+    // console.log(day);
+    const dayMonth = diasEnUnMes(month, year);
+    // console.log(dayMonth);
+    // let nuevafecha  = g;
+    if (dayValidate === 6) {
+      day = day + 6;
+      // console.log(day)
+    }
+    if (dayValidate === 0) {
+      day = day + 7;
+      // console.log(day)
+    }
+    if (day > dayMonth) {
+      month++;
+    }
+    tempcompetitionDate = `${year}-${month}-${day}`;
+    // console.log(`response competion date:${year}-${month}-${day}`);
+    // console.log(createdAt);
+    // const competitionDate = new Date("2022-11-1");
+  } else if (lastCharacter == "3" && poetry === "epica") {
+    // concursara el ultimo dia del mes
+    let createdYear = createdAt.getFullYear();
+    let createMonth = createdAt.getMonth() + 1;
+    let dayMonth = diasEnUnMes(createMonth, createdYear);
+    let newDay = new Date(`${createdYear}-${createMonth}-${dayMonth}`);
+    let validateDay = newDay.getDay();
+    // console.log(validateDay);
+    // console.log(newDay);
+
+    if (validateDay === 6) {
+      dayMonth = dayMonth - 1;
+    }
+    if (validateDay === 0) {
+      dayMonth = dayMonth - 2;
+    }
+    tempcompetitionDate = `${createdYear}-${createMonth}-${dayMonth}`;
+    // const competitionDate = new Date("2022-11-1");
+  } else {
+    // TODO:: para dos los demas sera el ultimo viernes del mes
+  }
+
+  // const competitionDate = new Date("2022-11-1");
+  const competitionDate = new Date(tempcompetitionDate);
+  console.log(competitionDate);
+
+  // const data = { ...req.body, birthDate, createdAt, competitionDate };
+  // console.log(data);
   // const data = req.body;
-  const newCalendar = await prisma.calendar.create({ data });
-  console.log(newCalendar);
-  res.status(201).json(newCalendar);
+  // const newCalendar = await prisma.calendar.create({ data });
+  // console.log(newCalendar);
+  // res.status(201).json(newCalendar);
 };
 
 //TODO: create update method
+
+function diasEnUnMes(mes: number, año: number) {
+  return new Date(año, mes, 0).getDate();
+}
