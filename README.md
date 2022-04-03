@@ -1,6 +1,13 @@
 # Prueba Teacnica Easygo
 
-# Creacion de Backend y Frontend
+# Tecnologias Utilizadas
+
+1. Sqlite
+2. Typescript
+3. Node
+4. Express
+5. Prisma(ORM)
+6. nodemon
 
 utilize el orm Prism,typescript,express
 
