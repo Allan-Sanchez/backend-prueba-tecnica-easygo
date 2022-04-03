@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { PrismaClient, Prisma } from "@prisma/client";
-
+import { daysInMonth } from "../utils/daysInMonth";
 const prisma = new PrismaClient();
 
 export const allCalendar = async (req: Request, res: Response) => {
@@ -11,86 +11,93 @@ export const allCalendar = async (req: Request, res: Response) => {
 export const createDate = async (req: Request, res: Response) => {
   const { birth, carnet, poetry } = req.body;
   const birthDate = new Date(birth);
+
+  //
   let tempcompetitionDate = "";
-  // delete birth
+
+  // delete birth of origina object
   delete req.body.birth;
-  // add date created
+
+  // add field createdAt
   const registerDate = Date.now();
   const createdAt = new Date(registerDate);
-  // const createdAt = new Date("2022-04-02");
-  // console.log(createdAt);
 
-  // condition date
+  // obtain the last element of the carnet
   const lastCharacter = carnet.split("").slice(-1);
 
+  let currentDay = createdAt.getDate();
+  let day = createdAt.getDate();
+  let year = createdAt.getFullYear();
+  let month = createdAt.getMonth() + 1;
+  let dayValidate = createdAt.getDay();
+  let daysMonth = daysInMonth(month, year);
+
+  // scenario 1 compete 5 days after registration
   if (lastCharacter == "1" && poetry === "dramatica") {
-    // concursara 5 dias despues sabado y domingo no cuenta
-    let day = createdAt.getDate();
-    let year = createdAt.getFullYear();
-    let month = createdAt.getMonth() + 1;
-    let dayValidate = createdAt.getDay();
-    // console.log(day);
-    const dayMonth = diasEnUnMes(month, year);
-    // console.log(dayMonth);
-    // let nuevafecha  = g;
+    // compete 5 days later saturday and sunday do not count
     if (dayValidate === 6) {
       day = day + 6;
-      // console.log(day)
-    }
-    if (dayValidate === 0) {
+    } else if (dayValidate === 0) {
+      day = day + 5;
+    } else {
       day = day + 7;
-      // console.log(day)
     }
-    if (day > dayMonth) {
+    if (day > daysMonth) {
+      // subtract the days and the difference is the days of the following month
+      day = currentDay - day;
       month++;
     }
     tempcompetitionDate = `${year}-${month}-${day}`;
   } else if (lastCharacter == "3" && poetry === "epica") {
-    // concursara el ultimo dia del mes
-    let createdYear = createdAt.getFullYear();
-    let createMonth = createdAt.getMonth() + 1;
-    let dayMonth = diasEnUnMes(createMonth, createdYear);
-    let newDay = new Date(`${createdYear}-${createMonth}-${dayMonth}`);
-    let validateDay = newDay.getDay();
+    //compete on the last day of the month
+    let lastDayOftheMonth = new Date(`${year}-${month}-${daysMonth}`);
+    let validateDay = lastDayOftheMonth.getDay();
 
     if (validateDay === 6) {
-      dayMonth = dayMonth - 1;
+      daysMonth = daysMonth - 1;
     }
     if (validateDay === 0) {
-      dayMonth = dayMonth - 2;
+      daysMonth = daysMonth - 2;
     }
-    tempcompetitionDate = `${createdYear}-${createMonth}-${dayMonth}`;
+    tempcompetitionDate = `${year}-${month}-${daysMonth}`;
   } else {
-    // TODO:: para dos los demas sera el ultimo viernes del mes
-    let day = createdAt.getDate();
-    let year = createdAt.getFullYear();
-    let month = createdAt.getMonth() + 1;
-    let dayValidate = createdAt.getDay();
-    const dayMonth = diasEnUnMes(month, year);
+    // scenario 3  date will be the last Friday of the week of enrollment
+    switch (dayValidate) {
+      case 6:
+        day = day + 6;
+        break;
+      case 5:
+        day = day + 7;
+        break;
+      case 4:
+        day = day + 1;
+        break;
+      case 3:
+        day = day + 2;
+        break;
+      case 2:
+        day = day + 3;
+        break;
+      case 1:
+        day = day + 4;
+        break;
+      case 0:
+        day = day + 5;
+        break;
+    }
 
-    if (dayValidate === 6) {
-      day = day + 6;
-    }
-    if (dayValidate === 0) {
-      day = day + 7;
-    }
-    if (day > dayMonth) {
+    if (day > daysMonth) {
+      // subtract the days and the difference is the days of the following month
+      day = currentDay - day;
       month++;
     }
     tempcompetitionDate = `${year}-${month}-${day}`;
   }
 
   const competitionDate = new Date(tempcompetitionDate);
-  console.log(competitionDate);
 
   const data = { ...req.body, birthDate, createdAt, competitionDate };
+  // save into DB
   const newCalendar = await prisma.calendar.create({ data });
-  console.log(newCalendar);
   res.status(201).json(newCalendar);
 };
-
-//TODO: create update method
-
-function diasEnUnMes(mes: number, año: number) {
-  return new Date(año, mes, 0).getDate();
-}
