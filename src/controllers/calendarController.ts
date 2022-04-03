@@ -45,9 +45,6 @@ export const createDate = async (req: Request, res: Response) => {
       month++;
     }
     tempcompetitionDate = `${year}-${month}-${day}`;
-    // console.log(`response competion date:${year}-${month}-${day}`);
-    // console.log(createdAt);
-    // const competitionDate = new Date("2022-11-1");
   } else if (lastCharacter == "3" && poetry === "epica") {
     // concursara el ultimo dia del mes
     let createdYear = createdAt.getFullYear();
@@ -55,8 +52,6 @@ export const createDate = async (req: Request, res: Response) => {
     let dayMonth = diasEnUnMes(createMonth, createdYear);
     let newDay = new Date(`${createdYear}-${createMonth}-${dayMonth}`);
     let validateDay = newDay.getDay();
-    // console.log(validateDay);
-    // console.log(newDay);
 
     if (validateDay === 6) {
       dayMonth = dayMonth - 1;
@@ -65,21 +60,33 @@ export const createDate = async (req: Request, res: Response) => {
       dayMonth = dayMonth - 2;
     }
     tempcompetitionDate = `${createdYear}-${createMonth}-${dayMonth}`;
-    // const competitionDate = new Date("2022-11-1");
   } else {
     // TODO:: para dos los demas sera el ultimo viernes del mes
+    let day = createdAt.getDate();
+    let year = createdAt.getFullYear();
+    let month = createdAt.getMonth() + 1;
+    let dayValidate = createdAt.getDay();
+    const dayMonth = diasEnUnMes(month, year);
+
+    if (dayValidate === 6) {
+      day = day + 6;
+    }
+    if (dayValidate === 0) {
+      day = day + 7;
+    }
+    if (day > dayMonth) {
+      month++;
+    }
+    tempcompetitionDate = `${year}-${month}-${day}`;
   }
 
-  // const competitionDate = new Date("2022-11-1");
   const competitionDate = new Date(tempcompetitionDate);
   console.log(competitionDate);
 
-  // const data = { ...req.body, birthDate, createdAt, competitionDate };
-  // console.log(data);
-  // const data = req.body;
-  // const newCalendar = await prisma.calendar.create({ data });
-  // console.log(newCalendar);
-  // res.status(201).json(newCalendar);
+  const data = { ...req.body, birthDate, createdAt, competitionDate };
+  const newCalendar = await prisma.calendar.create({ data });
+  console.log(newCalendar);
+  res.status(201).json(newCalendar);
 };
 
 //TODO: create update method
