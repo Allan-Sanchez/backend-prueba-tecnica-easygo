@@ -54,7 +54,7 @@ npx prisma migrate reset
 ```
 
 ```
-npx prisma migrate dev --nama init
+npx prisma migrate dev --nama new_init
 ```
 
 ```
